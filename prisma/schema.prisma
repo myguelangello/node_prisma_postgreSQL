@@ -7,101 +7,59 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model categoria {
-  id                Int                 @id @default(autoincrement())
-  descricao         String              @unique(map: "categoria_descricao_ukey") @db.VarChar
-  produto_categoria produto_categoria[]
+model admin {
+  usuario_id Int        @id @default(autoincrement())
+  usuario    usuario    @relation(fields: [usuario_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fkey_usuario_admin")
+  resposta   resposta[]
 }
 
-model cliente {
-  usuario_id Int     @id
-  usuario    usuario @relation(fields: [usuario_id], references: [id], onUpdate: Restrict)
-  venda      venda[]
+model pergunta {
+  id          Int        @id @default(autoincrement())
+  texto       String     @db.VarChar
+  usuario_id  Int        @default(autoincrement())
+  sala_codigo Int        @default(autoincrement())
+  sala        sala       @relation(fields: [sala_codigo], references: [codigo], onDelete: NoAction, onUpdate: NoAction, map: "fkey_sala_pergunta")
+  usuario     usuario    @relation(fields: [usuario_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fkey_usuario_pergunta")
+  resposta    resposta[]
 }
 
-model estoque {
-  filial_id  Int
-  produto_id Int
-  quantidade Int
-  filial     filial  @relation(fields: [filial_id], references: [id], onUpdate: Restrict)
-  produto    produto @relation(fields: [produto_id], references: [id], onUpdate: Restrict)
-
-  @@id([filial_id, produto_id])
+model resposta {
+  id          Int      @id @default(autoincrement())
+  texto       String   @db.VarChar
+  pergunta_id Int      @default(autoincrement())
+  admin_id    Int      @default(autoincrement())
+  admin       admin    @relation(fields: [admin_id], references: [usuario_id], onDelete: NoAction, onUpdate: NoAction, map: "fkey_admin_resposta")
+  pergunta    pergunta @relation(fields: [pergunta_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fkey_pergunta_resposta")
 }
 
-model filial {
-  id           Int       @id @default(autoincrement())
-  razao_social String    @db.VarChar
-  endereco     String    @db.VarChar
-  email        String    @db.VarChar
-  estoque      estoque[]
-  venda        venda[]
+model sala {
+  codigo        Int             @id @default(autoincrement())
+  assunto       String          @db.VarChar
+  inicio_em     DateTime        @db.Timestamp(6)
+  fim_em        DateTime?       @db.Timestamp(6)
+  status        Boolean?        @default(true)
+  admin_id      Int             @default(autoincrement())
+  usuario       usuario         @relation(fields: [admin_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fkey_admin_sala")
+  pergunta      pergunta[]
+  sala_usuarios sala_usuarios[]
 }
 
-model funcionario {
-  usuario_id Int     @id
-  salario    Decimal @db.Decimal
-  usuario    usuario @relation(fields: [usuario_id], references: [id], onUpdate: Restrict)
-  venda      venda[]
-}
+model sala_usuarios {
+  sala_codigo Int     @default(autoincrement())
+  usuario_id  Int     @default(autoincrement())
+  sala        sala    @relation(fields: [sala_codigo], references: [codigo], onDelete: NoAction, onUpdate: NoAction, map: "fkey_sala_sala_usuario")
+  usuario     usuario @relation(fields: [usuario_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fkey_usuario_sala_usuario")
 
-model produto {
-  id                Int                 @id @default(autoincrement())
-  descricao         String              @db.VarChar
-  preco             Decimal             @db.Decimal
-  estoque           estoque[]
-  produto_categoria produto_categoria[]
-  venda_item        venda_item[]
-}
-
-model produto_categoria {
-  produto_id   Int
-  categoria_id Int
-  categoria    categoria @relation(fields: [categoria_id], references: [id], onUpdate: Restrict)
-  produto      produto   @relation(fields: [produto_id], references: [id], onUpdate: Restrict)
-
-  @@id([produto_id, categoria_id])
+  @@id([sala_codigo, usuario_id])
 }
 
 model usuario {
-  id               Int                @id @default(autoincrement())
-  nome             String             @db.VarChar
-  endereco         String             @db.VarChar
-  email            String             @db.VarChar
-  login            String             @db.VarChar
-  senha            String             @db.VarChar
-  cliente          cliente?
-  funcionario      funcionario?
-  usuario_telefone usuario_telefone[]
-}
-
-model usuario_telefone {
-  usuario_id Int
-  ddd        Int
-  numero     Decimal @db.Decimal
-  usuario    usuario @relation(fields: [usuario_id], references: [id], onUpdate: Restrict)
-
-  @@id([usuario_id, ddd, numero])
-}
-
-model venda {
-  id             Int          @id @default(autoincrement())
-  data           DateTime     @db.Timestamp(6)
-  cliente_id     Int
-  funcionario_id Int
-  filial_id      Int
-  cliente        cliente      @relation(fields: [cliente_id], references: [usuario_id], onUpdate: Restrict)
-  filial         filial       @relation(fields: [filial_id], references: [id], onUpdate: Restrict)
-  funcionario    funcionario  @relation(fields: [funcionario_id], references: [usuario_id], onUpdate: Restrict)
-  venda_item     venda_item[]
-}
-
-model venda_item {
-  venda_id   Int
-  produto_id Int
-  quantidade Int
-  produto    produto @relation(fields: [produto_id], references: [id], onUpdate: Restrict)
-  venda      venda   @relation(fields: [venda_id], references: [id], onUpdate: Restrict)
-
-  @@id([venda_id, produto_id])
+  id            Int             @id @default(autoincrement())
+  nome          String          @db.VarChar
+  email         String          @unique(map: "ukey_usuario_email") @db.VarChar
+  senha         String          @db.VarChar
+  admin         admin?
+  pergunta      pergunta[]
+  sala          sala[]
+  sala_usuarios sala_usuarios[]
 }
