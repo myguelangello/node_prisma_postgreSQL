@@ -6,3 +6,102 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model categoria {
+  id                Int                 @id @default(autoincrement())
+  descricao         String              @unique(map: "categoria_descricao_ukey") @db.VarChar
+  produto_categoria produto_categoria[]
+}
+
+model cliente {
+  usuario_id Int     @id
+  usuario    usuario @relation(fields: [usuario_id], references: [id], onUpdate: Restrict)
+  venda      venda[]
+}
+
+model estoque {
+  filial_id  Int
+  produto_id Int
+  quantidade Int
+  filial     filial  @relation(fields: [filial_id], references: [id], onUpdate: Restrict)
+  produto    produto @relation(fields: [produto_id], references: [id], onUpdate: Restrict)
+
+  @@id([filial_id, produto_id])
+}
+
+model filial {
+  id           Int       @id @default(autoincrement())
+  razao_social String    @db.VarChar
+  endereco     String    @db.VarChar
+  email        String    @db.VarChar
+  estoque      estoque[]
+  venda        venda[]
+}
+
+model funcionario {
+  usuario_id Int     @id
+  salario    Decimal @db.Decimal
+  usuario    usuario @relation(fields: [usuario_id], references: [id], onUpdate: Restrict)
+  venda      venda[]
+}
+
+model produto {
+  id                Int                 @id @default(autoincrement())
+  descricao         String              @db.VarChar
+  preco             Decimal             @db.Decimal
+  estoque           estoque[]
+  produto_categoria produto_categoria[]
+  venda_item        venda_item[]
+}
+
+model produto_categoria {
+  produto_id   Int
+  categoria_id Int
+  categoria    categoria @relation(fields: [categoria_id], references: [id], onUpdate: Restrict)
+  produto      produto   @relation(fields: [produto_id], references: [id], onUpdate: Restrict)
+
+  @@id([produto_id, categoria_id])
+}
+
+model usuario {
+  id               Int                @id @default(autoincrement())
+  nome             String             @db.VarChar
+  endereco         String             @db.VarChar
+  email            String             @db.VarChar
+  login            String             @db.VarChar
+  senha            String             @db.VarChar
+  cliente          cliente?
+  funcionario      funcionario?
+  usuario_telefone usuario_telefone[]
+}
+
+model usuario_telefone {
+  usuario_id Int
+  ddd        Int
+  numero     Decimal @db.Decimal
+  usuario    usuario @relation(fields: [usuario_id], references: [id], onUpdate: Restrict)
+
+  @@id([usuario_id, ddd, numero])
+}
+
+model venda {
+  id             Int          @id @default(autoincrement())
+  data           DateTime     @db.Timestamp(6)
+  cliente_id     Int
+  funcionario_id Int
+  filial_id      Int
+  cliente        cliente      @relation(fields: [cliente_id], references: [usuario_id], onUpdate: Restrict)
+  filial         filial       @relation(fields: [filial_id], references: [id], onUpdate: Restrict)
+  funcionario    funcionario  @relation(fields: [funcionario_id], references: [usuario_id], onUpdate: Restrict)
+  venda_item     venda_item[]
+}
+
+model venda_item {
+  venda_id   Int
+  produto_id Int
+  quantidade Int
+  produto    produto @relation(fields: [produto_id], references: [id], onUpdate: Restrict)
+  venda      venda   @relation(fields: [venda_id], references: [id], onUpdate: Restrict)
+
+  @@id([venda_id, produto_id])
+}
