@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { CreateRoomController } from './controllers/CreateRoomController';
 
 import { CreateUserController } from './controllers/CreateUserController';
 import { DeleteUserController } from './controllers/DeleteUserController';
@@ -22,6 +23,10 @@ router.put('/user', updateUser.handle)
 // delete user
 const deleteUser = new DeleteUserController();
 router.delete('/user', deleteUser.handle)
+
+// create room
+const createRoom = new CreateRoomController();
+router.post('/room', createRoom.handle)
 
 
 export { router }
