@@ -7,14 +7,14 @@ export class CreateRoomController {
     
     const admin_id = request.userId
 
-    let roomId;
     let isRoom = true;
 
     while (isRoom) {
       /* gera o número da sala */
-      const max = Math.floor(999999)
+      const max = Math.floor(999999) 
       const min = Math.ceil(100000)
-      roomId = Math.floor(Math.random() * (max - min + 1) + min)
+
+      let roomId = Math.floor(Math.random() * (max - min + 1) + min)
 
       // verificar se esse número já existe 
       const roomsExistIds = await prismaClient.sala.findFirst({ 
@@ -23,7 +23,6 @@ export class CreateRoomController {
         } 
       });
 
-      console.log(roomId)
       if (!roomsExistIds) {
         isRoom = false;
         const room = await prismaClient.sala.create({
