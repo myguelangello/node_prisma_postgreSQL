@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { verify } from 'jsonwebtoken';
 
 type TokenPayload = {
-  id: string;
+  id?: string;
   iat: number;
   exp: number;
 }

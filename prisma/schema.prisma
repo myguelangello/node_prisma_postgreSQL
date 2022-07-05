@@ -33,7 +33,7 @@ model resposta {
 }
 
 model sala {
-  codigo        Int             @id @default(autoincrement())
+  codigo        Int             @id //@default(autoincrement())
   assunto       String          @db.VarChar
   inicio_em     DateTime        @db.Timestamp(6)
   fim_em        DateTime?       @db.Timestamp(6)
