@@ -4,13 +4,15 @@ import { CreateRoomController } from './controllers/CreateRoomController';
 
 import { CreateUserController } from './controllers/CreateUserController';
 import { DeleteUserController } from './controllers/DeleteUserController';
+import { EnterRoomController } from './controllers/EnterRoomController';
+import { ReadAllRoomsController } from './controllers/ReadAllRoomsController';
 import { ReadAllUsersController } from './controllers/ReadAllUsersController';
 import { UpdateUserController } from './controllers/UpdateUserController';
 import { AuthMiddleware } from './middlewares/authMiddleware';
 
 const router = Router();
 
-// create unique user
+// create user
 const createUser = new CreateUserController();
 router.post('/user', createUser.handle)
 
@@ -32,7 +34,14 @@ router.delete('/user', deleteUser.handle)
 
 // create room
 const createRoom = new CreateRoomController();
-router.post('/room', AuthMiddleware, createRoom.handle)
+router.post('/rooms/new', AuthMiddleware, createRoom.handle)
 
+// enter room
+const enterRoom = new EnterRoomController();
+router.post('/room', AuthMiddleware, enterRoom.handle)
+
+// read all rooms
+const readRooms = new ReadAllRoomsController();
+router.get('/rooms', AuthMiddleware, readRooms.handle)
 
 export { router }
