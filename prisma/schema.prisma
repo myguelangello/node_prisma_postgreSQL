@@ -18,7 +18,7 @@ model pergunta {
   texto       String     @db.VarChar
   usuario_id  Int        @default(autoincrement())
   sala_codigo Int        @default(autoincrement())
-  sala        sala       @relation(fields: [sala_codigo], references: [codigo], onDelete: NoAction, onUpdate: NoAction, map: "fkey_sala_pergunta")
+  sala        sala       @relation(fields: [sala_codigo], references: [codigo], onDelete: NoAction, onUpdate: Cascade, map: "fkey_sala_pergunta")
   usuario     usuario    @relation(fields: [usuario_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fkey_usuario_pergunta")
   resposta    resposta[]
 }

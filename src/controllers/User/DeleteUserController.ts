@@ -1,15 +1,16 @@
 import { Request, Response } from 'express';
-import { prismaClient } from '../database/prismaClient';
+import { prismaClient } from '../../database/prismaClient';
 
 export class DeleteUserController {
   async handle(request:Request, response:Response) {
-    const { id } = request.body
+    const { id } = request.params
+    
     const deleteUser = await prismaClient.usuario.delete({
       where: {
-        id
+        id: Number(id)
       }
     })
 
-    return response.json({message: 'Delete user'});
+    return response.json({message: 'the user was deleted'});
   }
 }

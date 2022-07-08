@@ -1,7 +1,7 @@
 import { compare } from "bcryptjs";
 import { Request, Response } from "express";
 import { sign } from "jsonwebtoken";
-import { prismaClient } from "../database/prismaClient";
+import { prismaClient } from "../../database/prismaClient";
 
 export class AuthController {
   async authenticate(request: Request, response: Response){
