@@ -7,59 +7,55 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model admin {
-  usuario_id Int        @id @default(autoincrement())
-  usuario    usuario    @relation(fields: [usuario_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fkey_usuario_admin")
-  resposta   resposta[]
+model User {
+  user_id           Int            @id @default(autoincrement())
+  user_name         String
+  user_email        String         @unique
+  user_password     String
+  rooms             Room[]
+  room_participants UsersOnRooms[]
+
+  @@map("users")
 }
 
-model pergunta {
-  id          Int        @id @default(autoincrement())
-  texto       String     @db.VarChar
-  usuario_id  Int        @default(autoincrement())
-  sala_codigo Int        @default(autoincrement())
-  sala        sala       @relation(fields: [sala_codigo], references: [codigo], onDelete: NoAction, onUpdate: Cascade, map: "fkey_sala_pergunta")
-  usuario     usuario    @relation(fields: [usuario_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fkey_usuario_pergunta")
-  resposta    resposta[]
+model Room {
+  room_id            String         @id @default(uuid())
+  room_title         String         @db.VarChar
+  room_created_at    DateTime       @default(now())
+  room_closed_at     DateTime?      @default(now())
+  user_admin_id      Int
+  user_admin         User           @relation(fields: [user_admin_id], references: [user_id])
+  questions          Question[]
+  users_participants UsersOnRooms[]
+
+  @@map("rooms")
 }
 
-model resposta {
-  id          Int      @id @default(autoincrement())
-  texto       String   @db.VarChar
-  pergunta_id Int      @default(autoincrement())
-  admin_id    Int      @default(autoincrement())
-  admin       admin    @relation(fields: [admin_id], references: [usuario_id], onDelete: NoAction, onUpdate: NoAction, map: "fkey_admin_resposta")
-  pergunta    pergunta @relation(fields: [pergunta_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fkey_pergunta_resposta")
+model UsersOnRooms {
+  user_id Int
+  room_id String
+  room    Room   @relation(fields: [room_id], references: [room_id])
+  user    User   @relation(fields: [user_id], references: [user_id])
+
+  @@id([user_id, room_id])
+  @@map("users_on_rooms")
 }
 
-model sala {
-  codigo        Int             @id //@default(autoincrement())
-  assunto       String          @db.VarChar
-  inicio_em     DateTime        @db.Timestamp(6)
-  fim_em        DateTime?       @db.Timestamp(6)
-  status        Boolean?        @default(true)
-  admin_id      Int             @default(autoincrement())
-  usuario       usuario         @relation(fields: [admin_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fkey_admin_sala")
-  pergunta      pergunta[]
-  sala_usuarios sala_usuarios[]
+model Question {
+  question_id      Int      @id @default(autoincrement())
+  question_content String   @db.VarChar
+  question_room_id String
+  room             Room     @relation(fields: [question_room_id], references: [room_id])
+  answers          Answer[]
+
+  @@map("questions")
 }
 
-model sala_usuarios {
-  sala_codigo Int     @default(autoincrement())
-  usuario_id  Int     @default(autoincrement())
-  sala        sala    @relation(fields: [sala_codigo], references: [codigo], onDelete: NoAction, onUpdate: NoAction, map: "fkey_sala_sala_usuario")
-  usuario     usuario @relation(fields: [usuario_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fkey_usuario_sala_usuario")
+model Answer {
+  answer_id          Int      @id @default(autoincrement())
+  answer_content     String   @db.VarChar
+  answer_question_id Int
+  question           Question @relation(fields: [answer_question_id], references: [question_id])
 
-  @@id([sala_codigo, usuario_id])
-}
-
-model usuario {
-  id            Int             @id @default(autoincrement())
-  nome          String          @db.VarChar
-  email         String          @unique(map: "ukey_usuario_email") @db.VarChar
-  senha         String          @db.VarChar
-  admin         admin?
-  pergunta      pergunta[]
-  sala          sala[]
-  sala_usuarios sala_usuarios[]
+  @@map("answers")
 }

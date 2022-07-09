@@ -21,49 +21,39 @@ import { ReadUniqueRoomController } from './controllers/Room/ReadUniqueRoomContr
 
 const router = Router();
 
-// create user
 const createUser = new CreateUserController();
-router.post('/user', createUser.handle)
-
-// authenticate user
 const authUser = new AuthController();
-router.post('/auth', authUser.authenticate)
-
-// read unique user
 const readUsers = new ReadAllUsersController();
-router.get('/users', AuthMiddleware, readUsers.handle)
-
-// update user
 const updateUser = new UpdateUserController();
-router.put('/user', AuthMiddleware, updateUser.handle)
-
-// delete user
 const deleteUser = new DeleteUserController();
-router.delete('/user', deleteUser.handle)
-
-// create room
 const createRoom = new CreateRoomController();
-router.post('/rooms/new', AuthMiddleware, createRoom.handle)
-
-// enter room
 const enterRoom = new EnterRoomController();
-router.post('/room', AuthMiddleware, enterRoom.handle)
-
-// read all rooms
 const readRooms = new ReadAllRoomsController();
-router.get('/rooms', AuthMiddleware, readRooms.handle)
-
-// read unique room
 const readUniqueRoom = new ReadUniqueRoomController();
-router.get('/room/:codigo_sala', AuthMiddleware, readUniqueRoom.handle)
-
-// delete room
 const deleteRoom = new DeleteRoomController();
-router.delete('/room/:codigo', AuthMiddleware, deleteRoom.handle)
-
-//QUESTIONS
-//create question
 const createQuestion = new CreateQuestionController();
+
+// create user
+router.post('/user', createUser.handle)
+// authenticate user
+router.post('/auth', authUser.authenticate)
+// read unique user
+router.get('/users', AuthMiddleware, readUsers.handle)
+// update user
+router.put('/user/:user_id', AuthMiddleware, updateUser.handle)
+// delete user
+router.delete('/user', deleteUser.handle)
+// create room
+router.post('/rooms/new', AuthMiddleware, createRoom.handle)
+// enter room
+router.post('/room', AuthMiddleware, enterRoom.handle)
+// read all rooms
+router.get('/rooms', AuthMiddleware, readRooms.handle)
+// read unique room
+router.get('/room/:codigo_sala', AuthMiddleware, readUniqueRoom.handle)
+// delete room
+router.delete('/room/:codigo', AuthMiddleware, deleteRoom.handle)
+//create question
 router.post('/question/:codigo_sala', AuthMiddleware, createQuestion.handle)
 
 export { router }

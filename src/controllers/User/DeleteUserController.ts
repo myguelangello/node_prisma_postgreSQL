@@ -5,12 +5,12 @@ export class DeleteUserController {
   async handle(request:Request, response:Response) {
     const { id } = request.params
     
-    const deleteUser = await prismaClient.usuario.delete({
+    const deleteUser = await prismaClient.user.delete({
       where: {
-        id: Number(id)
+        user_id: Number(id)
       }
     })
 
-    return response.json({message: 'the user was deleted'});
+    return response.json({message: 'Your account has been successfully deleted'});
   }
 }
