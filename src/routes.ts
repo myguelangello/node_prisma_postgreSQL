@@ -35,25 +35,35 @@ const createQuestion = new CreateQuestionController();
 
 // create user
 router.post('/user', createUser.handle)
+
 // authenticate user
 router.post('/auth', authUser.authenticate)
+
 // read unique user
 router.get('/users', AuthMiddleware, readUsers.handle)
+
 // update user
 router.put('/user/:user_id', AuthMiddleware, updateUser.handle)
+
 // delete user
 router.delete('/user', deleteUser.handle)
+
 // create room
 router.post('/rooms/new', AuthMiddleware, createRoom.handle)
+
 // enter room
-router.post('/room', AuthMiddleware, enterRoom.handle)
+router.post('/room/:room_id', AuthMiddleware, enterRoom.handle)
+
 // read all rooms
 router.get('/rooms', AuthMiddleware, readRooms.handle)
+
 // read unique room
 router.get('/room/:codigo_sala', AuthMiddleware, readUniqueRoom.handle)
+
 // delete room
 router.delete('/room/:codigo', AuthMiddleware, deleteRoom.handle)
+
 //create question
-router.post('/question/:codigo_sala', AuthMiddleware, createQuestion.handle)
+router.post('/question/:room_id', AuthMiddleware, createQuestion.handle)
 
 export { router }

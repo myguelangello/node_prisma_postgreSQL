@@ -1,4 +1,4 @@
-import { hash } from 'bcryptjs';
+import { compare, hash } from 'bcryptjs';
 import { Request, Response } from 'express';
 import { prismaClient } from '../../database/prismaClient';
 
@@ -33,9 +33,11 @@ export class UpdateUserController {
     if (!user) {
       return response.json({ failed: "User not found"})
     }
+
+    const isValuePassword = await compare(user_current_password, user.user_password);
        
-    if(!(user.user_password === user_current_password)){
-      return response.json({ failed: "Your current password is incorrect"})
+    if(!isValuePassword){
+      return response.json({isValuePassword ,failed: "Your current password is incorrect"})
     }
 
     if (user_current_password === user_new_password) {
