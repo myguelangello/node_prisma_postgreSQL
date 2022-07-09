@@ -1,33 +1,56 @@
 import { Request, Response } from "express";
 import { prismaClient } from '../../database/prismaClient';
 
+type UsersOnRooms = {
+  user_logged: number
+}
+
 export class EnterRoomController {
   async handle(request: Request, response: Response) {
-    const { codigo } = request.body;
-    const userId = request.userId
+    const { room_id } = request.params;
+    const user_logged = Number(request.userId)
+
+
+    const roomExists = await prismaClient.room.findUnique({ where:{ room_id } })
 
     // verificar se esse número já existe 
-    if (!(await prismaClient.sala.findFirst({ where:{ codigo } }))) {
-      return response.json({ message: "Ops, room not found" });
-    }
-    
-    //verificar se o usuário não é o admin da própria sala
-    if (await prismaClient.sala.findFirst({ where:{ admin_id: userId } })) {
-      return response.json({ message: "Ops, user is the room creator!" });
-    }
-    
-    //verificar se o usuário já pertence a sala
-    if (await prismaClient.sala_usuarios.findFirst({ where:{ usuario_id: userId } })) {
-      return response.json({ message: "Ops, user already belongs to the room!" });
+    if (!roomExists) {
+      return response.json({ failed: "Oops, invalid room code" });
     }
 
-    const user = await prismaClient.sala_usuarios.create({ 
-      data: { 
-        sala_codigo: codigo, 
-        usuario_id: userId
+    // verificar se o usuário é admin (não preisa entrar nela)
+    if(roomExists.user_admin_id === user_logged) {
+      return response.json({ failed: "Ops, user is the room creator!" });
+    }
+    
+    const userAlreadyBelongsToRoom = await prismaClient.usersOnRooms.findUnique({ 
+      where: { 
+        user_id_room_id: { 
+          user_id: user_logged, 
+          room_id 
+        }
+      } 
+    }) 
+
+    if (userAlreadyBelongsToRoom) {
+      return response.json({ failed: "User already belongs to room!" });
+    }
+
+    const usersOnRooms = await prismaClient.usersOnRooms.create({
+      data: {
+        room: {
+          connect: {
+            room_id
+          }
+        }, 
+        user: {
+          connect: {
+            user_id: user_logged
+          }
+        }
       }
     })
 
-    return response.json({ message: "User entered the room"})
+    return response.json({message: "User entered the room"})
   }
 }

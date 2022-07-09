@@ -4,7 +4,7 @@ import { prismaClient } from '../../database/prismaClient';
 export class ReadAllUsersController {
   async handle(request:Request, response:Response) {
 
-    const allUsers = await prismaClient.usuario.findMany()
+    const allUsers = await prismaClient.user.findMany()
 
     return response.json(allUsers);
   }
