@@ -13,6 +13,7 @@ model User {
   user_email        String         @unique
   user_password     String
   rooms             Room[]
+  question          Question[]
   room_participants UsersOnRooms[]
 
   @@map("users")
@@ -46,6 +47,8 @@ model Question {
   question_content String   @db.VarChar
   question_room_id String
   room             Room     @relation(fields: [question_room_id], references: [room_id])
+  user_author_id   Int
+  user_author      User     @relation(fields: [user_author_id], references: [user_id])
   answers          Answer[]
 
   @@map("questions")

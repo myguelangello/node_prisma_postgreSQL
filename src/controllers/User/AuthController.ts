@@ -14,7 +14,7 @@ export class AuthController {
     })
 
     if (!user) {
-      return response.json({ failed: "User not found, want to create new account?"})
+      return response.json({ failed: "Incorrect email or passwords"})
     }
 
     const isValuePassword = await compare(user_password, user.user_password);

@@ -17,7 +17,10 @@ import { ReadAllRoomsController } from './controllers/Room/ReadAllRoomsControlle
 
 //question controller
 import { CreateQuestionController } from './controllers/Question/CreateQuestionController';
-import { ReadUniqueRoomController } from './controllers/Room/ReadUniqueRoomController';
+import { ListQuestionsController } from './controllers/Question/ListQuestionsController';
+
+//answer controller
+import { CreateAnswerController } from './controllers/Answer/CreateAnswerController';
 
 const router = Router();
 
@@ -29,9 +32,10 @@ const deleteUser = new DeleteUserController();
 const createRoom = new CreateRoomController();
 const enterRoom = new EnterRoomController();
 const readRooms = new ReadAllRoomsController();
-const readUniqueRoom = new ReadUniqueRoomController();
+const readUniqueRoom = new ListQuestionsController();
 const deleteRoom = new DeleteRoomController();
 const createQuestion = new CreateQuestionController();
+const createAnswer = new CreateAnswerController();
 
 // create user
 router.post('/user', createUser.handle)
@@ -52,18 +56,21 @@ router.delete('/user', deleteUser.handle)
 router.post('/rooms/new', AuthMiddleware, createRoom.handle)
 
 // enter room
-router.post('/room/:room_id', AuthMiddleware, enterRoom.handle)
+router.post('/rooms', AuthMiddleware, enterRoom.handle)
 
 // read all rooms
 router.get('/rooms', AuthMiddleware, readRooms.handle)
 
-// read unique room
-router.get('/room/:codigo_sala', AuthMiddleware, readUniqueRoom.handle)
+// list questions in room
+router.get('/room/:room_id', AuthMiddleware, readUniqueRoom.handle)
 
 // delete room
 router.delete('/room/:codigo', AuthMiddleware, deleteRoom.handle)
 
 //create question
 router.post('/question/:room_id', AuthMiddleware, createQuestion.handle)
+
+//create answer
+router.post('/:room_id/:question_id', AuthMiddleware, createAnswer.handle)
 
 export { router }

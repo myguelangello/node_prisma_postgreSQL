@@ -7,7 +7,8 @@ type UsersOnRooms = {
 
 export class EnterRoomController {
   async handle(request: Request, response: Response) {
-    const { room_id } = request.params;
+    const { access_code } = request.body;
+    const room_id = access_code;
     const user_logged = Number(request.userId)
 
 
@@ -25,7 +26,7 @@ export class EnterRoomController {
     
     const userAlreadyBelongsToRoom = await prismaClient.usersOnRooms.findUnique({ 
       where: { 
-        user_id_room_id: { 
+        user_id_room_id: { // precisa passar user_id e room_id pois é uma PK composta
           user_id: user_logged, 
           room_id 
         }

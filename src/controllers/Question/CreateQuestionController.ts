@@ -3,35 +3,64 @@ import { prismaClient } from "../../database/prismaClient";
 
 export class CreateQuestionController {
   async handle(request: Request, response: Response) {
-    // receber o cod da sala
-    const { codigo_sala } = request.params
+    // receber o room_id
+    const { room_id } = request.params
 
     // receber o conteudo da pergunta
-    const { texto } = request.body
+    const { question_content } = request.body
 
     // id do usuario que enviou a mensagem 
-    const userId = request.userId
+    const user_logged = request.userId
 
-    const verify = await prismaClient.sala_usuarios.findFirst({
+    // verificar se a sala existe
+    const roomExists = await prismaClient.room.findUnique({
+      where: { 
+        room_id
+      }
+    })
+    if (!roomExists) {
+      return response.json({failed:"Oops, rooms not found"})
+    }
+
+    // verificar se a sala está aberta
+    if(!(roomExists.room_closed_at === null)) {
+      return response.json({failed: "Oops, this room aldeary closed by the creator"})
+    }
+    // verificar se o usuario logado é o admin da sala
+    if(user_logged === roomExists.user_admin_id){
+      return response.json({failed: "You are a creator and cannot submit questions. But take the opportunity to answer the questions received"})
+    }
+
+    // verificar se o usuário pertence à sala
+    const userBelongsToRoom = await prismaClient.usersOnRooms.findUnique({
       where: {
-        sala_codigo: Number(codigo_sala),
-        usuario_id: userId
+        user_id_room_id: {
+          user_id: user_logged,
+          room_id: room_id
+        }
+      }
+    });
+
+    if (!(userBelongsToRoom)) {
+      return response.json({failed: "User does not belong to the room"})
+    }
+
+    const createQuestion = await prismaClient.question.create({ 
+      data: {
+        question_content,
+        room: {
+          connect: {
+            room_id
+          }
+        },
+        user_author: {
+          connect: {
+            user_id: user_logged
+          }
+        }
       }
     })
 
-   try {
-      const pergunta = await prismaClient.pergunta.create({
-      data:{
-        texto,
-        usuario_id: userId,
-        sala_codigo: Number(codigo_sala)
-      }
-    })
-    return response.json(pergunta)
-  } catch (error) {
-    console.log(error)
-    return response.json(error)
-     
-   }
+    return response.json({message: "Question created successfully", createQuestion });
   }
 }
