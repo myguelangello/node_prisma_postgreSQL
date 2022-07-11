@@ -16,7 +16,7 @@ export class EnterRoomController {
 
     // verificar se esse número já existe 
     if (!roomExists) {
-      return response.json({ failed: "Oops, invalid room code" });
+      return response.json({ failed: "Oops, room does not exist." });
     }
 
     // verificar se o usuário é admin (não preisa entrar nela)
@@ -52,6 +52,6 @@ export class EnterRoomController {
       }
     })
 
-    return response.json({message: "User entered the room"})
+    return response.status(201).json({message: "User entered the room"})
   }
 }

@@ -35,7 +35,7 @@ export class AuthController {
 
     const { user_id } = user;
 
-    return response.json({user: { user_id, user_email }, token});
+    return response.json({ token, user });
 
  }
 }

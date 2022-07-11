@@ -6,7 +6,6 @@ import { AuthMiddleware } from './middlewares/authMiddleware';
 import { AuthController } from './controllers/User/AuthController';
 import { CreateUserController } from './controllers/User/CreateUserController';
 import { DeleteUserController } from './controllers/User/DeleteUserController';
-import { ReadAllUsersController } from './controllers/User/ReadAllUsersController';
 import { UpdateUserController } from './controllers/User/UpdateUserController';
 
 // room controller
@@ -21,12 +20,13 @@ import { ListQuestionsController } from './controllers/Question/ListQuestionsCon
 
 //answer controller
 import { CreateAnswerController } from './controllers/Answer/CreateAnswerController';
+import { ReadUserController } from './controllers/User/ReadUserController';
 
 const router = Router();
 
 const createUser = new CreateUserController();
 const authUser = new AuthController();
-const readUsers = new ReadAllUsersController();
+const readUser = new ReadUserController();
 const updateUser = new UpdateUserController();
 const deleteUser = new DeleteUserController();
 const createRoom = new CreateRoomController();
@@ -43,8 +43,8 @@ router.post('/user', createUser.handle)
 // authenticate user
 router.post('/auth', authUser.authenticate)
 
-// read unique user
-router.get('/users', AuthMiddleware, readUsers.handle)
+// read user
+router.get('/user_unique', AuthMiddleware, readUser.handle)
 
 // update user
 router.put('/user/:user_id', AuthMiddleware, updateUser.handle)
